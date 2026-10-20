@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "node scripts/generate-notices.mjs && esbuild src/app.js src/portal.js --bundle --format=esm --platform=browser --legal-comments=external --outdir=site",
-    "test": "node --test src/core.test.js src/discovery.test.js"
+    "build": "node scripts/generate-notices.mjs && esbuild src/app.js src/portal.js src/wallet-actions.js --bundle --format=esm --platform=browser --legal-comments=external --outdir=site",
+    "test": "node --test src/core.test.js src/discovery.test.js src/evm-actions.test.js"
   },
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "0.38.1",
