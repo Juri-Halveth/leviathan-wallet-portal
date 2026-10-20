@@ -1,0 +1,11 @@
+{
+  "schema": "HALVETH_RIGHTS_NOTICE_V1",
+  "project": "LEVIATHAN Wallet Portal",
+  "repository": "https://github.com/Juri-Halveth/leviathan-wallet-portal",
+  "rightsHolderClaim": "Juri Janovski, publishing as Juri Halveth, to the extent applicable rights exist and are controlled by him",
+  "assignedLicense": "LicenseRef-HALVETH-PIRL-2.0",
+  "scope": "Only new original contributions expressly assigned in LICENSES.md; earlier grants, third-party software, data, facts and general ideas remain outside this assignment",
+  "textAndDataMiningReservation": "Reserved to the extent applicable and legally reservable, including under German Copyright Act Section 44b(3)",
+  "commercialPermission": "Requires a separate written agreement where permission is legally required",
+  "notices": ["LICENSES.md", "LICENSE-HALVETH-PIRL-2.0.md", "THIRD_PARTY_NOTICES.md"]
+}

@@ -1,0 +1,25 @@
+{
+  "retrievedAt": "2026-10-19",
+  "managers": [
+    {
+      "chainId": 1,
+      "address": "0xC36442b4a4522E871399CD717aBDD847Ab11FE88",
+      "source": "https://developers.uniswap.org/docs/protocols/v3/deployments/v3-ethereum-deployments"
+    },
+    {
+      "chainId": 8453,
+      "address": "0x03a520b32C04BF3bEEf7BEb72E919cf822Ed34f1",
+      "source": "https://developers.uniswap.org/docs/protocols/v3/deployments/v3-base-deployments"
+    },
+    {
+      "chainId": 10,
+      "address": "0xC36442b4a4522E871399CD717aBDD847Ab11FE88",
+      "source": "https://developers.uniswap.org/docs/protocols/v3/deployments/v3-optimism-deployments"
+    },
+    {
+      "chainId": 42161,
+      "address": "0xC36442b4a4522E871399CD717aBDD847Ab11FE88",
+      "source": "https://developers.uniswap.org/docs/protocols/v3/deployments/v3-arbitrum-deployments"
+    }
+  ]
+}

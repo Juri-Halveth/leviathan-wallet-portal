@@ -1,0 +1,11 @@
+node_modules/
+site/app.js
+site/portal.js
+site/*.LEGAL.txt
+.local/
+*.log
+*.pcap
+*.har
+*.env
+.env.*
+!*.example.env
