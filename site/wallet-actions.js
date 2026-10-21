@@ -110,8 +110,8 @@ function buildTransfer({ asset, from, to, amount }) {
 function sameAddress(a, b) {
   return typeof a === "string" && typeof b === "string" && a.toLowerCase() === b.toLowerCase();
 }
-function requestIntent({ from, contract, amount = "10000000000" }) {
-  return { type: "ETH_REQUEST_INTENT", version: 1, chainId: "0x1", from: address(from), contract: address(contract), requestedWei: amountToUnits(amount).toString(), message: "Bitte ETH an die angegebene Wallet senden. Diese Bitte l\xF6st keine \xDCberweisung aus." };
+function requestIntent({ recipient, contract, amount = "10000000000" }) {
+  return { type: "ETH_REQUEST_INTENT", version: 1, chainId: "0x1", recipient: address(recipient), contract: address(contract), requestedWei: amountToUnits(amount).toString(), message: "Bitte ETH an die angegebene Wallet senden. Diese Bitte l\xF6st keine \xDCberweisung aus." };
 }
 
 // src/wallet-actions.js
@@ -326,11 +326,11 @@ async function wish(event) {
   updateButtons();
   setStatus("wish-status", "Contract wird gepr\xFCft \u2026");
   try {
-    const from = await boundWallet(), contract = address($("contract").value.trim()), amount = $("wish-amount").value.trim();
+    const recipient = await boundWallet(), contract = address($("contract").value.trim()), amount = $("wish-amount").value.trim();
     const code = await walletRpc(provider, "eth_getCode", [contract, "latest"]);
     if (typeof code !== "string" || code === "0x") throw Error("An dieser Adresse wurde kein Contract-Code gefunden.");
     await boundWallet();
-    const intent = requestIntent({ from, contract, amount });
+    const intent = requestIntent({ recipient, contract, amount });
     intent.createdAt = (/* @__PURE__ */ new Date()).toISOString();
     const blob = new Blob([JSON.stringify(intent, null, 2) + "\n"], { type: "application/json" }), url = URL.createObjectURL(blob), a = document.createElement("a");
     a.href = url;

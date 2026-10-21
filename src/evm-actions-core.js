@@ -22,6 +22,6 @@ export function buildTransfer({asset,from,to,amount}){
   throw Error('Dieses Asset ist hier nicht freigegeben.');
 }
 export function sameAddress(a,b){return typeof a==='string'&&typeof b==='string'&&a.toLowerCase()===b.toLowerCase();}
-export function requestIntent({from,contract,amount='10000000000'}){
-  return {type:'ETH_REQUEST_INTENT',version:1,chainId:'0x1',from:address(from),contract:address(contract),requestedWei:amountToUnits(amount).toString(),message:'Bitte ETH an die angegebene Wallet senden. Diese Bitte löst keine Überweisung aus.'};
+export function requestIntent({recipient,contract,amount='10000000000'}){
+  return {type:'ETH_REQUEST_INTENT',version:1,chainId:'0x1',recipient:address(recipient),contract:address(contract),requestedWei:amountToUnits(amount).toString(),message:'Bitte ETH an die angegebene Wallet senden. Diese Bitte löst keine Überweisung aus.'};
 }

@@ -25,8 +25,9 @@ test('ETH zero recipient is explicit, ERC20 uses its contract and encoded recipi
   assert.throws(()=>buildTransfer({asset:'FAKE',from:sender,to:target,amount:'1'}));
 });
 test('ETH request intent contains no executable transaction or signature',()=>{
-  const intent=requestIntent({from:sender,contract:target,amount:'10000000000'});
+  const intent=requestIntent({recipient:sender,contract:target,amount:'10000000000'});
   assert.equal(intent.requestedWei,'10000000000000000000000000000');
+  assert.equal(intent.recipient,sender);
   assert.equal(intent.contract,target);
   assert.equal(Object.hasOwn(intent,'data'),false);
   assert.equal(Object.hasOwn(intent,'signature'),false);
