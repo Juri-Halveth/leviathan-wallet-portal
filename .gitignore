@@ -1,6 +1,7 @@
 node_modules/
 site/app.js
 site/portal.js
+site/vault.js
 site/*.LEGAL.txt
 .local/
 *.log

@@ -20,7 +20,7 @@ export function mountLuminousWallet(){
   try{hideDust=localStorage.getItem('halveth:luminous:hideDust')!=='no';}catch{}
   root.innerHTML=`
   <div class="lw-atmosphere" aria-hidden="true"></div>
-  <header class="lw-header"><a class="lw-brand" href="#vault"><span class="lw-brand-symbol">✦</span> HALVETH <small>LEVIATHAN / LUCINET</small></a><div class="lw-header-right"><span class="lw-local"><i></i> BROWSER VAULT</span><button class="lw-icon" id="lw-tools" aria-label="Werkzeuge öffnen" title="Werkzeuge öffnen">⌘</button></div></header>
+  <header class="lw-header"><a class="lw-brand" href="#vault"><span class="lw-brand-symbol">✦</span> HALVETH <small>LEVIATHAN / LUCINET</small></a><div class="lw-header-right"><span class="lw-local"><i></i> BROWSER VAULT</span></div></header>
   <main class="lw-main" id="vault">
     <div class="lw-titlebar"><span class="lw-kicker">DEIN VERMÖGEN · EIN SIGNAL</span><span id="lw-clock" class="lw-kicker"></span></div>
     <section class="lw-stage" aria-label="Wallet-Übersicht">
@@ -228,7 +228,6 @@ $('lw-refresh').onclick=refresh;
     const run=++epoch;clearInterval(timer);detachEvm();walletActions.clearConnection('Öffentliche Adresse wird gelesen.');activePlugin=null;provider=null;reset();keys.set(c.id,address);setBusy(true);status('Öffentliche Positionen lesen …');
     try{await scan([...keys],run);}finally{if(run===epoch)setBusy(false);}
   };
-  $('lw-tools').onclick=()=>{const legacy=document.getElementById('legacy-workspace');legacy.hidden=!legacy.hidden;document.body.classList.toggle('lw-tools-open',!legacy.hidden);if(!legacy.hidden)window.dispatchEvent(new Event('halveth:open-tools'));if(!legacy.hidden)legacy.scrollIntoView({behavior:'smooth'});};
   function accountChanged(){epoch++;clearInterval(timer);detachEvm();walletActions.clearConnection('Wallet-Konto oder Netzwerk geändert.');provider=null;reset();setBusy(false);$('lw-connect').querySelector('span').textContent='Wallet neu verbinden';status('Wallet-Konto oder aktives Netzwerk geändert. Neu verbinden.');}
   window.addEventListener('keplr_keystorechange',()=>{if(activePlugin?.kind==='cosmos')accountChanged();});window.addEventListener('owallet_keystorechange',()=>{if(activePlugin?.kind==='cosmos')accountChanged();});window.addEventListener('leap_keystorechange',()=>{if(activePlugin?.id==='leap')accountChanged();});
   const clock=()=>{$('lw-clock').textContent=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Berlin'})+' / BERLIN';};clock();setInterval(clock,30000);
