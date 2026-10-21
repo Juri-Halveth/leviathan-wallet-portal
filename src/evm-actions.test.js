@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {ZERO_ADDRESS,GTC_ADDRESS,address,amountToUnits,hexToBigInt,buildTransfer,requestIntent} from './evm-actions-core.js';
+import {ZERO_ADDRESS,GTC_ADDRESS,address,amountToUnits,hexToBigInt,buildTransfer,preflightFailureMessage,requestIntent} from './evm-actions-core.js';
 
 const sender='0x1111111111111111111111111111111111111111';
 const target='0x2222222222222222222222222222222222222222';
@@ -31,4 +31,16 @@ test('ETH request intent contains no executable transaction or signature',()=>{
   assert.equal(intent.contract,target);
   assert.equal(Object.hasOwn(intent,'data'),false);
   assert.equal(Object.hasOwn(intent,'signature'),false);
+});
+test('preflight message attributes the actual failed stage without claiming an on-chain result',()=>{
+  const network=preflightFailureMessage('WALLET',Error('Ethereum Mainnet auswählen.'));
+  assert.match(network,/Wallet- und Netzwerkprüfung/);
+  assert.doesNotMatch(network,/GTC-Contract weist/);
+  const balance=preflightFailureMessage('TOKEN_BALANCE',Error('Dein GTC-Guthaben reicht nicht.'));
+  assert.match(balance,/GTC-Guthabenprüfung/);
+  assert.doesNotMatch(balance,/Transfer-Simulation/);
+  const revert=preflightFailureMessage('TRANSFER_SIMULATION',Error('GTC::_transferTokens: cannot transfer to the zero address'));
+  assert.match(revert,/Transfer-Simulation per eth_call/);
+  assert.match(revert,/cannot transfer to the zero address/);
+  assert.match(revert,/nicht angefordert/);
 });

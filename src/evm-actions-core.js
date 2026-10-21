@@ -22,6 +22,16 @@ export function buildTransfer({asset,from,to,amount}){
   throw Error('Dieses Asset ist hier nicht freigegeben.');
 }
 export function sameAddress(a,b){return typeof a==='string'&&typeof b==='string'&&a.toLowerCase()===b.toLowerCase();}
+export function preflightFailureMessage(stage,error){
+  const labels={
+    WALLET:'Wallet- und Netzwerkprüfung',INPUT:'Eingabeprüfung',CONTRACT_CODE:'GTC-Contract-Prüfung',
+    TOKEN_BALANCE:'GTC-Guthabenprüfung',ETH_BALANCE:'ETH-Guthabenprüfung',
+    TRANSFER_SIMULATION:'Transfer-Simulation per eth_call',GAS_ESTIMATE:'Gas-Schätzung',
+    FINAL_WALLET:'Abschließende Wallet-Prüfung'
+  };
+  const detail=typeof error?.message==='string'&&error.message.trim()?error.message.trim().slice(0,300):'Unbekannter Fehler.';
+  return `${labels[stage]||'Vorprüfung'}: ${detail} Eine Transaktion wurde nicht angefordert.`;
+}
 export function requestIntent({recipient,contract,amount='10000000000'}){
   return {type:'ETH_REQUEST_INTENT',version:1,chainId:'0x1',recipient:address(recipient),contract:address(contract),requestedWei:amountToUnits(amount).toString(),message:'Bitte ETH an die angegebene Wallet senden. Diese Bitte löst keine Überweisung aus.'};
 }

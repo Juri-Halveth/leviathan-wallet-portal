@@ -110,6 +110,20 @@ function buildTransfer({ asset, from, to, amount }) {
 function sameAddress(a, b) {
   return typeof a === "string" && typeof b === "string" && a.toLowerCase() === b.toLowerCase();
 }
+function preflightFailureMessage(stage, error) {
+  const labels = {
+    WALLET: "Wallet- und Netzwerkpr\xFCfung",
+    INPUT: "Eingabepr\xFCfung",
+    CONTRACT_CODE: "GTC-Contract-Pr\xFCfung",
+    TOKEN_BALANCE: "GTC-Guthabenpr\xFCfung",
+    ETH_BALANCE: "ETH-Guthabenpr\xFCfung",
+    TRANSFER_SIMULATION: "Transfer-Simulation per eth_call",
+    GAS_ESTIMATE: "Gas-Sch\xE4tzung",
+    FINAL_WALLET: "Abschlie\xDFende Wallet-Pr\xFCfung"
+  };
+  const detail = typeof error?.message === "string" && error.message.trim() ? error.message.trim().slice(0, 300) : "Unbekannter Fehler.";
+  return `${labels[stage] || "Vorpr\xFCfung"}: ${detail} Eine Transaktion wurde nicht angefordert.`;
+}
 function requestIntent({ recipient, contract, amount = "10000000000" }) {
   return { type: "ETH_REQUEST_INTENT", version: 1, chainId: "0x1", recipient: address(recipient), contract: address(contract), requestedWei: amountToUnits(amount).toString(), message: "Bitte ETH an die angegebene Wallet senden. Diese Bitte l\xF6st keine \xDCberweisung aus." };
 }
@@ -242,38 +256,43 @@ async function checkTransfer(event) {
   updateButtons();
   setStatus("send-status", "Wallet und Transaktion werden gepr\xFCft \u2026");
   const run = epoch;
+  let stage = "WALLET";
   try {
-    const from = await boundWallet(), asset = $("asset").value, recipient = address($("recipient").value.trim()), amount = $("amount").value.trim();
+    const from = await boundWallet();
+    stage = "INPUT";
+    const asset = $("asset").value, recipient = address($("recipient").value.trim()), amount = $("amount").value.trim();
     const tx = buildTransfer({ asset, from, to: recipient, amount });
     if (asset === "GTC") {
+      stage = "CONTRACT_CODE";
       const code = await walletRpc(provider, "eth_getCode", [GTC_ADDRESS, "latest"]);
       if (typeof code !== "string" || code === "0x") throw Error("Der GTC-Contract ist auf diesem Netzwerk nicht erreichbar.");
+      stage = "TOKEN_BALANCE";
       const balanceCall = { to: GTC_ADDRESS, data: "0x70a08231" + from.slice(2).toLowerCase().padStart(64, "0") };
       const balance = hexToBigInt(await walletRpc(provider, "eth_call", [balanceCall, "latest"]));
       if (amountToUnits(amount) > balance) throw Error("Dein GTC-Guthaben reicht f\xFCr diesen Betrag nicht.");
     } else {
+      stage = "ETH_BALANCE";
       const balance = hexToBigInt(await walletRpc(provider, "eth_getBalance", [from, "latest"]));
       if (amountToUnits(amount) > balance) throw Error("Dein ETH-Guthaben reicht f\xFCr diesen Betrag nicht.");
     }
+    stage = "TRANSFER_SIMULATION";
     const callResult = await walletRpc(provider, "eth_call", [tx, "latest"]);
     if (asset === "GTC" && callResult !== "0x" && hexToBigInt(callResult) === 0n) throw Error("Der GTC-Contract hat den Transfer bei der Vorpr\xFCfung abgelehnt.");
+    stage = "GAS_ESTIMATE";
     const gas = hexToBigInt(await walletRpc(provider, "eth_estimateGas", [tx])).toString();
+    stage = "FINAL_WALLET";
     await boundWallet();
     if (run !== epoch) throw Error("Eingabe oder Wallet hat sich ge\xE4ndert. Bitte erneut pr\xFCfen.");
     preview = { tx, asset, from, recipient, amount, gas, epoch, at: Date.now(), atMonotonic: performance.now() };
     showPreview(preview);
     setStatus("send-status", "Pr\xFCfung erfolgreich. Die Wallet zeigt vor dem Senden noch einmal alle Daten.", "success");
   } catch (error) {
-    setStatus("send-status", assetZeroMessage(error), "error");
+    setStatus("send-status", preflightFailureMessage(stage, error), "error");
   } finally {
     busy = false;
     updateButtons();
     refreshSendButton();
   }
-}
-function assetZeroMessage(error) {
-  if ($("asset").value === "GTC" && sameAddress($("recipient").value.trim(), ZERO_ADDRESS)) return "Der GTC-Contract weist Transfers an die Nulladresse zur\xFCck. W\xE4hle eine andere Zieladresse.";
-  return error?.message || "Pr\xFCfung fehlgeschlagen.";
 }
 async function send() {
   if (!preview) return;

@@ -1,6 +1,6 @@
 import {createWalletPlugins} from './wallet-plugins.js';
 import {walletRpc,normalizeChain} from './evm-read.js';
-import {ZERO_ADDRESS,GTC_ADDRESS,address,amountToUnits,hexToBigInt,buildTransfer,sameAddress,requestIntent} from './evm-actions-core.js';
+import {ZERO_ADDRESS,GTC_ADDRESS,address,amountToUnits,hexToBigInt,buildTransfer,sameAddress,preflightFailureMessage,requestIntent} from './evm-actions-core.js';
 
 const $=id=>document.getElementById(id);
 let plugins,provider=null,account=null,epoch=0,preview=null,busy=false;
@@ -50,31 +50,36 @@ function showPreview(data){
 }
 function refreshSendButton(){if(!preview)return;$('send-button').disabled=busy||(preview.asset==='ETH'&&sameAddress(preview.recipient,ZERO_ADDRESS)&&!$('zero-confirm').checked);}
 async function checkTransfer(event){
-  event.preventDefault();invalidate();busy=true;updateButtons();setStatus('send-status','Wallet und Transaktion werden geprüft …');const run=epoch;
+  event.preventDefault();invalidate();busy=true;updateButtons();setStatus('send-status','Wallet und Transaktion werden geprüft …');const run=epoch;let stage='WALLET';
   try{
-    const from=await boundWallet(),asset=$('asset').value,recipient=address($('recipient').value.trim()),amount=$('amount').value.trim();
+    const from=await boundWallet();stage='INPUT';const asset=$('asset').value,recipient=address($('recipient').value.trim()),amount=$('amount').value.trim();
     const tx=buildTransfer({asset,from,to:recipient,amount});
     if(asset==='GTC'){
+      stage='CONTRACT_CODE';
       const code=await walletRpc(provider,'eth_getCode',[GTC_ADDRESS,'latest']);
       if(typeof code!=='string'||code==='0x')throw Error('Der GTC-Contract ist auf diesem Netzwerk nicht erreichbar.');
+      stage='TOKEN_BALANCE';
       const balanceCall={to:GTC_ADDRESS,data:'0x70a08231'+from.slice(2).toLowerCase().padStart(64,'0')};
       const balance=hexToBigInt(await walletRpc(provider,'eth_call',[balanceCall,'latest']));
       if(amountToUnits(amount)>balance)throw Error('Dein GTC-Guthaben reicht für diesen Betrag nicht.');
     }else{
+      stage='ETH_BALANCE';
       const balance=hexToBigInt(await walletRpc(provider,'eth_getBalance',[from,'latest']));
       if(amountToUnits(amount)>balance)throw Error('Dein ETH-Guthaben reicht für diesen Betrag nicht.');
     }
+    stage='TRANSFER_SIMULATION';
     const callResult=await walletRpc(provider,'eth_call',[tx,'latest']);
     if(asset==='GTC'&&callResult!=='0x'&&hexToBigInt(callResult)===0n)throw Error('Der GTC-Contract hat den Transfer bei der Vorprüfung abgelehnt.');
+    stage='GAS_ESTIMATE';
     const gas=hexToBigInt(await walletRpc(provider,'eth_estimateGas',[tx])).toString();
+    stage='FINAL_WALLET';
     await boundWallet();
     if(run!==epoch)throw Error('Eingabe oder Wallet hat sich geändert. Bitte erneut prüfen.');
     preview={tx,asset,from,recipient,amount,gas,epoch,at:Date.now(),atMonotonic:performance.now()};showPreview(preview);
     setStatus('send-status','Prüfung erfolgreich. Die Wallet zeigt vor dem Senden noch einmal alle Daten.','success');
-  }catch(error){setStatus('send-status',assetZeroMessage(error),'error');}
+  }catch(error){setStatus('send-status',preflightFailureMessage(stage,error),'error');}
   finally{busy=false;updateButtons();refreshSendButton();}
 }
-function assetZeroMessage(error){if($('asset').value==='GTC'&&sameAddress($('recipient').value.trim(),ZERO_ADDRESS))return 'Der GTC-Contract weist Transfers an die Nulladresse zurück. Wähle eine andere Zieladresse.';return error?.message||'Prüfung fehlgeschlagen.';}
 async function send(){
   if(!preview)return;const selected=preview;
   if(Date.now()<selected.at||Date.now()-selected.at>60000||performance.now()<selected.atMonotonic||performance.now()-selected.atMonotonic>60000){invalidate();setStatus('send-status','Die Prüfung ist abgelaufen oder die Zeitbasis hat sich geändert. Bitte erneut prüfen.','error');return;}
