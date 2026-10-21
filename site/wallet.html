@@ -1,9 +1,90 @@
 <!doctype html>
-<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#090c18"><title>LEVIATHAN · Wallet-Aktionen</title><meta name="description" content="ETH und GTC über deine eigene Wallet empfangen und senden."><link rel="stylesheet" href="wallet-actions.css"></head>
-<body><div class="sky" aria-hidden="true"></div><header><a class="brand" href="./">✦ <span>HALVETH <small>LEVIATHAN / LUCINET</small></span></a><a class="back" href="./">← Zum Überblick</a></header>
-<main><div class="heading"><p class="eyebrow">WALLET / EIGENE ENTSCHEIDUNG</p><h1>Deine Adresse.<br><em>Dein Zug.</em></h1><p>Empfangen, prüfen, senden. Du wählst die Wallet und bestätigst jeden Transfer darin selbst.</p></div>
-<section class="panel connection"><div class="section-head"><span class="number">01</span><div><h2>Wallet wählen</h2><p>Ethereum Mainnet · ETH und offizielles Gitcoin GTC</p></div></div><div class="row"><label for="wallet-choice">Erkannte Wallet</label><select id="wallet-choice" aria-label="Erkannte Wallet wählen"></select><button id="rescan" class="secondary" type="button">Neu suchen</button><button id="connect" type="button">Verbinden ↗</button></div><p id="account" class="address">Noch keine Wallet verbunden.</p><p id="connection-status" class="status" role="status" aria-live="polite"></p></section>
-<div class="grid"><section class="panel"><div class="section-head"><span class="number">02</span><div><h2>Empfangen</h2><p>Diese Adresse kannst du teilen.</p></div></div><div id="receive-address" class="address display">Nach dem Verbinden erscheint deine Adresse.</div><button id="copy-address" class="secondary" type="button" disabled>Adresse kopieren</button></section>
-<section class="panel"><div class="section-head"><span class="number">03</span><div><h2>Senden</h2><p>Der Ziel-Check passiert vor der Wallet-Bestätigung.</p></div></div><form id="send-form"><label for="asset">Asset</label><select id="asset"><option value="ETH">ETH · Ethereum</option><option value="GTC">GTC · Gitcoin</option></select><label for="recipient">Zieladresse</label><input id="recipient" autocomplete="off" spellcheck="false" placeholder="0x…" required><button id="zero" class="inline" type="button">Nulladresse einsetzen</button><label for="amount">Betrag</label><input id="amount" inputmode="decimal" autocomplete="off" placeholder="0.0" required><button id="preview-button" type="submit" disabled>Transfer prüfen ↗</button></form><div id="preview" class="preview" hidden></div><label id="zero-confirm-wrap" class="check" hidden><input id="zero-confirm" type="checkbox"> Ich will ETH bewusst an die Nulladresse senden. Dieser Transfer ist endgültig.</label><button id="send-button" class="send" type="button" disabled hidden>In Wallet bestätigen ↗</button><p id="send-status" class="status" role="status" aria-live="polite"></p></section></div>
-<section class="panel wish"><div class="section-head"><span class="number">04</span><div><h2>Die große ETH-Bitte</h2><p>Ein teilbarer Wunsch an einen ausgewählten Smart Contract.</p></div></div><p>Schreib deine Bitte als JSON. Ein Contract zahlt nur aus, wenn seine eigene Logik das tatsächlich vorsieht.</p><form id="wish-form"><label for="contract">Smart-Contract-Adresse auf Ethereum</label><input id="contract" autocomplete="off" spellcheck="false" placeholder="0x…" required><label for="wish-amount">Gewünschte ETH</label><input id="wish-amount" inputmode="decimal" value="10000000000" required><button id="wish-button" type="submit" disabled>Bitte erstellen ↓</button></form><p id="wish-status" class="status" role="status" aria-live="polite"></p></section>
-<footer><span>JURI JANOVSKI / HALVETH</span><a href="https://github.com/Juri-Halveth/leviathan-wallet-portal">Quellcode &amp; Rechte ↗</a></footer></main><script type="module" src="wallet-actions.js"></script></body></html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#080910">
+  <title>LEVIATHAN · Wallet</title>
+  <meta name="description" content="Deine Wallet verbinden, ETH und GTC empfangen oder einen Transfer in der Wallet bestätigen.">
+  <link rel="stylesheet" href="wallet-actions.css">
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Zum Leviathan Browser Vault"><span class="brand-star">✦</span><strong>HALVETH</strong><small>LEVIATHAN / LUCINET</small></a>
+    <a class="vault-link" href="./">← ZUM BROWSER VAULT</a>
+  </header>
+  <main>
+    <div class="titlebar"><span>DEINE WALLET · DEIN SIGNAL</span><span>ETHEREUM MAINNET / 01</span></div>
+    <section class="hero" aria-label="Wallet-Aktionen">
+      <div class="hero-copy">
+        <p class="kicker">LUCINET / WALLET INTELLIGENCE</p>
+        <h1>Alles verbunden.<br><em>Dein nächster Zug.</em></h1>
+        <p class="lead">Ein Ort für deine Empfangsadresse und bewusste Transfers. Deine Wallet zeigt dir den letzten Schritt.</p>
+        <a class="hero-cta" href="#actions">Aktion wählen <span>↗</span></a>
+      </div>
+      <div class="cosmos" aria-hidden="true">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div>
+        <div class="cosmos-core"><span>LEVIATHAN</span><strong>✦</strong><small>DEINE WALLET</small></div>
+        <span class="satellite satellite-one">EMPFANGEN</span><span class="satellite satellite-two">PRÜFEN</span><span class="satellite satellite-three">BESTÄTIGEN</span>
+        <span class="cosmos-caption">LUCINET • WALLET FIELD / 02</span>
+      </div>
+    </section>
+    <div class="signal"><span class="signal-dot"></span><span>Du wählst die Aktion. Die Wallet bestätigt den Transfer.</span></div>
+
+    <section class="connection" aria-labelledby="connect-title">
+      <div class="section-heading"><div><p class="kicker">DEINE VERBINDUNG</p><h2 id="connect-title">Wallet verbinden.</h2></div><span class="section-mark">01 / 02</span></div>
+      <p class="section-intro">Wähle eine erkannte Wallet in diesem Browser.</p>
+      <div class="connection-controls"><label class="sr-only" for="wallet-choice">Erkannte Wallet</label><select id="wallet-choice" aria-label="Erkannte Wallet wählen"></select><button id="rescan" class="quiet" type="button">Neu suchen ↻</button><button id="connect" class="primary" type="button">Wallet verbinden <span>↗</span></button></div>
+      <p id="account" class="address">Noch keine Wallet verbunden.</p>
+      <p id="connection-status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="actions" class="actions" aria-labelledby="actions-title">
+      <div class="section-heading"><div><p class="kicker">DEINE MÖGLICHKEITEN</p><h2 id="actions-title">Was möchtest du tun?</h2></div><span class="section-mark">02 / 02</span></div>
+      <div class="view-tabs" role="tablist" aria-label="Wallet-Aktion">
+        <button class="view-tab active" id="tab-receive" type="button" role="tab" aria-selected="true" aria-controls="view-receive" data-view="receive"><span>01</span> Empfangen</button>
+        <button class="view-tab" id="tab-send" type="button" role="tab" aria-selected="false" aria-controls="view-send" data-view="send"><span>02</span> Senden</button>
+        <button class="view-tab" id="tab-wish" type="button" role="tab" aria-selected="false" aria-controls="view-wish" data-view="wish"><span>03</span> ETH-Bitte</button>
+      </div>
+
+      <div id="view-receive" class="view-panel" role="tabpanel" aria-labelledby="tab-receive">
+        <p class="kicker">DEINE KOORDINATEN</p><h3>Hier kommt es an.</h3>
+        <p>Das ist die Adresse deiner verbundenen Wallet. Du kannst sie kopieren und teilen.</p>
+        <div id="receive-address" class="address address-large">Nach dem Verbinden erscheint deine Adresse.</div>
+        <button id="copy-address" class="primary" type="button" disabled>Adresse kopieren <span>↗</span></button>
+      </div>
+
+      <div id="view-send" class="view-panel" role="tabpanel" aria-labelledby="tab-send" hidden>
+        <p class="kicker">DEIN TRANSFER</p><h3>Prüfen. Dann bestätigen.</h3>
+        <p>Adresse und Betrag eingeben, die Vorprüfung lesen und erst danach in deiner Wallet entscheiden.</p>
+        <form id="send-form" class="form-grid">
+          <div><label for="asset">Asset</label><select id="asset"><option value="ETH">ETH · Ethereum</option><option value="GTC">GTC · Gitcoin</option></select></div>
+          <div><label for="recipient">Zieladresse</label><input id="recipient" autocomplete="off" spellcheck="false" placeholder="0x…" required></div>
+          <button id="zero" class="text-button" type="button">Nulladresse einsetzen</button>
+          <div><label for="amount">Betrag</label><input id="amount" inputmode="decimal" autocomplete="off" placeholder="0.0" required></div>
+          <button id="preview-button" class="primary" type="submit" disabled>Transfer prüfen <span>↗</span></button>
+        </form>
+        <div id="preview" class="preview" hidden></div>
+        <label id="zero-confirm-wrap" class="check" hidden><input id="zero-confirm" type="checkbox"> Ich will ETH bewusst an die Nulladresse senden. Dieser Transfer ist endgültig.</label>
+        <button id="send-button" class="primary confirm" type="button" disabled hidden>In Wallet bestätigen <span>↗</span></button>
+        <p id="send-status" class="status" role="status" aria-live="polite"></p>
+      </div>
+
+      <div id="view-wish" class="view-panel" role="tabpanel" aria-labelledby="tab-wish" hidden>
+        <p class="kicker">DEINE ANFRAGE</p><h3>Eine Bitte formulieren.</h3>
+        <p>Speichere eine ETH-Bitte als JSON. Sie wird dadurch noch nicht an einen Contract gesendet.</p>
+        <form id="wish-form" class="form-grid">
+          <div><label for="contract">Smart-Contract-Adresse auf Ethereum</label><input id="contract" autocomplete="off" spellcheck="false" placeholder="0x…" required></div>
+          <div><label for="wish-amount">Gewünschte ETH</label><input id="wish-amount" inputmode="decimal" value="10000000000" required></div>
+          <button id="wish-button" class="primary" type="submit" disabled>Bitte als JSON speichern <span>↓</span></button>
+        </form>
+        <p id="wish-status" class="status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <footer><span>HALVETH / VERACHEL STUDIOS</span><span><a href="./">BROWSER VAULT ↗</a> · <a href="https://github.com/Juri-Halveth/leviathan-wallet-portal">CODE &amp; RECHTE ↗</a></span></footer>
+  </main>
+  <script type="module" src="wallet-actions.js"></script>
+</body>
+</html>

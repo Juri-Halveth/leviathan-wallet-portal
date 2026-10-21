@@ -367,6 +367,29 @@ async function wish(event) {
 plugins = createWalletPlugins(renderChoices);
 renderChoices();
 updateButtons();
+var views = [...document.querySelectorAll("[data-view]")];
+function activateView(name, focus = false) {
+  for (const tab of views) {
+    const active = tab.dataset.view === name;
+    tab.classList.toggle("active", active);
+    tab.setAttribute("aria-selected", String(active));
+    tab.tabIndex = active ? 0 : -1;
+    $(tab.getAttribute("aria-controls")).hidden = !active;
+    if (active && focus) tab.focus();
+  }
+}
+for (const tab of views) {
+  tab.addEventListener("click", () => activateView(tab.dataset.view));
+  tab.addEventListener("keydown", (event) => {
+    const index = views.indexOf(tab);
+    const next = event.key === "ArrowRight" ? (index + 1) % views.length : event.key === "ArrowLeft" ? (index - 1 + views.length) % views.length : event.key === "Home" ? 0 : event.key === "End" ? views.length - 1 : -1;
+    if (next >= 0) {
+      event.preventDefault();
+      activateView(views[next].dataset.view, true);
+    }
+  });
+}
+activateView("receive");
 $("rescan").addEventListener("click", () => plugins.request());
 $("connect").addEventListener("click", connect);
 $("copy-address").addEventListener("click", async () => {
