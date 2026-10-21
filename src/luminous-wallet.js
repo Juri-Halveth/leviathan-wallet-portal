@@ -3,6 +3,8 @@ import {evmChains,evmAddress,walletRpc} from './evm-read.js';
 import {discoverEvmNetworks} from './evm-discovery.js';
 import {jsonFetch,readCosmos,validateWatch,actionLink,formatUnits} from './discovery.js';
 import {buildPortfolio,money,shortId,groups} from './portfolio.js';
+import {mountWalletActions} from './wallet-actions.js';
+import {walletActionsDialog} from './wallet-actions-view.js';
 
 const e=(tag,cls,text)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=text;return n;};
 const labels=Object.fromEntries(groups);
@@ -22,7 +24,7 @@ export function mountLuminousWallet(){
   <main class="lw-main" id="vault">
     <div class="lw-titlebar"><span class="lw-kicker">DEIN VERMÖGEN · EIN SIGNAL</span><span id="lw-clock" class="lw-kicker"></span></div>
     <section class="lw-stage" aria-label="Wallet-Übersicht">
-      <div class="lw-intro"><p class="lw-kicker">LUCINET / WALLET INTELLIGENCE</p><h1>Alles verbunden.<br><em>Alles im Blick.</em></h1><p class="lw-lead" id="lw-lead">Deine Wallet ist der Schlüssel.<br>Wir finden, wo dein Vermögen liegt.</p><button id="lw-connect" class="lw-connect" disabled><span>Wallet verbinden</span><b>↗</b></button><p class="lw-micro" id="lw-account">Wallet frei wählen · Cosmos & Ethereum / EVM</p><p class="lw-micro"><a href="wallet.html">ETH &amp; GTC senden oder empfangen ↗</a></p><details class="lw-watch"><summary>Öffentliche Adresse ansehen</summary><form id="lw-watch-form"><label for="lw-network">Netzwerk</label><select id="lw-network"></select><label for="lw-address">Öffentliche Adresse</label><input id="lw-address" autocomplete="off" spellcheck="false" placeholder="orai1…"><button type="submit">Positionen finden ↗</button></form></details></div>
+      <div class="lw-intro"><p class="lw-kicker">LUCINET / WALLET INTELLIGENCE</p><h1>Alles verbunden.<br><em>Alles im Blick.</em></h1><p class="lw-lead" id="lw-lead">Deine Wallet ist der Schlüssel.<br>Wir finden, wo dein Vermögen liegt.</p><button id="lw-connect" class="lw-connect" disabled><span>Wallet verbinden</span><b>↗</b></button><p class="lw-micro" id="lw-account">Wallet frei wählen · Cosmos & Ethereum / EVM</p><p class="lw-micro"><button id="lw-open-actions" class="lw-inline-link" type="button">ETH &amp; GTC senden oder empfangen ↗</button></p><details class="lw-watch"><summary>Öffentliche Adresse ansehen</summary><form id="lw-watch-form"><label for="lw-network">Netzwerk</label><select id="lw-network"></select><label for="lw-address">Öffentliche Adresse</label><input id="lw-address" autocomplete="off" spellcheck="false" placeholder="orai1…"><button type="submit">Positionen finden ↗</button></form></details></div>
       <div class="lw-cosmos" aria-label="Visuelle Verteilung deiner Positionen"><div class="lw-grid" aria-hidden="true"></div><div class="lw-orbit lw-orbit-one" aria-hidden="true"></div><div class="lw-orbit lw-orbit-two" aria-hidden="true"></div><div class="lw-orbit lw-orbit-three" aria-hidden="true"></div><svg class="lw-rays" viewBox="0 0 600 500" aria-hidden="true"><path d="M300 250L140 110M300 250L475 150M300 250L450 385M300 250L125 370"/></svg><div class="lw-core"><span id="lw-total-label">DEIN VERMÖGEN</span><strong id="lw-total">—</strong><small id="lw-total-scope">Wartet auf Verbindung</small></div><div id="lw-satellites"></div><span class="lw-coordinate">LUCINET • POSITION FIELD / 01</span></div>
     </section>
     <div class="lw-statusbar"><div><span class="lw-status-dot"></span><span id="lw-status" role="status" aria-live="polite">Bereit für deine Wallet.</span></div><button id="lw-refresh" class="lw-icon" aria-label="Positionen aktualisieren" title="Positionen aktualisieren" hidden>↻</button></div>
@@ -30,8 +32,16 @@ export function mountLuminousWallet(){
     <footer class="lw-footer"><span>HALVETH / VERACHEL STUDIOS</span><details><summary>Quellen & Abdeckung</summary><div id="lw-coverage">Bankguthaben, natives Staking, Freigaben und Erträge der angebundenen Cosmos-Netzwerke. EVM: automatische Suche auf Ethereum, Optimism, Base, Arbitrum, BNB Chain, Polygon und Avalanche. Native Coins, ERC-20-Kandidaten und angebundene Pool-Positionen; weitere Protokolle und Bitcoin bleiben offen. Öffentliche Adressen werden an konfigurierte PublicNode-RPCs und auf drei Netzwerken an Blockscout übermittelt. Die Wallet gibt jedes Netzwerk selbst frei. Unbekannte Kurse bleiben sichtbar.</div><div id="lw-scan-coverage"></div><p id="lw-quotes"></p><button id="lw-enable-networks" class="lw-action" hidden>Weitere Netzwerke freigeben</button></details><span class="lw-footer-signal"><a href="https://github.com/Juri-Halveth/leviathan-wallet-portal" target="_blank" rel="noopener noreferrer">CODE &amp; RECHTE ↗</a> · ✦ DEINE WALLET. DEIN SIGNAL.</span></footer>
   </main>
   <dialog id="lw-wallet-picker" class="lw-dialog lw-picker" aria-label="Wallet auswählen"><button id="lw-picker-close" class="lw-close" aria-label="Wallet-Auswahl schließen">×</button><p class="lw-kicker">DEINE VERBINDUNG</p><h2>Wähle deine Wallet.</h2><p class="lw-micro">Verbinde die Erweiterung oder den integrierten Wallet-Browser deiner Wahl.</p><div id="lw-wallet-options" class="lw-wallet-options"></div><p class="lw-micro lw-picker-note">Erkannt bedeutet: Eine Schnittstelle ist in diesem Browser vorhanden. Die Wallet bestätigt den Zugriff selbst. Mobile QR-Verbindung ist noch nicht angebunden.</p><button id="lw-wallet-rescan" class="lw-action">Wallets erneut erkennen ↻</button></dialog>
-  <dialog id="lw-detail" class="lw-dialog" aria-label="Details zur Position"><button id="lw-close" class="lw-close" aria-label="Details schließen">×</button><div id="lw-detail-body"></div></dialog>`;
+  <dialog id="lw-detail" class="lw-dialog" aria-label="Details zur Position"><button id="lw-close" class="lw-close" aria-label="Details schließen">×</button><div id="lw-detail-body"></div></dialog>
+  ${walletActionsDialog}`;
   const $=id=>document.getElementById(id);
+  const walletActions=mountWalletActions();
+  function openWalletActions(){if(!$('lw-evm-actions').open)$('lw-evm-actions').showModal();}
+  $('lw-evm-close').onclick=()=>$('lw-evm-actions').close();
+  $('lw-evm-actions').onclick=event=>{if(event.target===$('lw-evm-actions'))$('lw-evm-actions').close();};
+  $('lw-open-actions').onclick=openWalletActions;
+  if(location.hash==='#wallet-actions')openWalletActions();
+  window.addEventListener('hashchange',()=>{if(location.hash==='#wallet-actions')openWalletActions();});
   $('lw-dust').checked=hideDust;
   const status=text=>{$('lw-status').textContent=text;};
   const allCosmos=()=>chains.filter(c=>c.kind==='cosmos');
@@ -165,12 +175,13 @@ export function mountLuminousWallet(){
   }
   async function connect(pluginId){
     if(busy)return;let choice;try{choice=walletPlugins.get(pluginId);}catch(err){status(err.message);return;}
-    const run=++epoch;clearInterval(timer);detachEvm();reset();activePlugin=choice;provider=choice.provider;setBusy(true);render();
+    const run=++epoch;clearInterval(timer);detachEvm();walletActions.clearConnection('Wallet wird gewechselt.');reset();activePlugin=choice;provider=choice.provider;setBusy(true);render();
     status(choice.name+' in deiner Wallet freigeben.');
     try{
       if(choice.kind==='evm'){
         const accounts=await walletRpc(provider,'eth_requestAccounts');if(run!==epoch)return;
         if(!Array.isArray(accounts)||!accounts.length)throw Error('Die Wallet hat keine Adresse freigegeben.');
+        walletActions.adoptConnection(provider,evmAddress(accounts[0]),choice.name);
         const changed=()=>{if(activePlugin?.id===choice.id)accountChanged();};
         if(typeof provider.on==='function'){for(const event of ['accountsChanged','chainChanged','disconnect'])provider.on(event,changed);const bound=provider;evmListenerCleanup=()=>{if(typeof bound.removeListener==='function')for(const event of ['accountsChanged','chainChanged','disconnect'])bound.removeListener(event,changed);};}
         await scanEvm(run,evmAddress(accounts[0]));
@@ -181,7 +192,7 @@ export function mountLuminousWallet(){
         if(run!==epoch)return;if(!keys.size)throw Error('Keine Netzwerkadresse freigegeben. Bitte Wallet und Netzwerk prüfen.');$('lw-enable-networks').hidden=false;await scan([...keys],run);
       }
       if(run===epoch){$('lw-connect').querySelector('span').textContent=choice.name+' verbunden';scheduleRefresh(run);}
-    }catch(err){if(run===epoch){detachEvm();provider=null;status(err.message||'Wallet-Verbindung nicht freigegeben.');$('lw-connect').querySelector('span').textContent='Wallet verbinden';}}
+    }catch(err){if(run===epoch){detachEvm();provider=null;walletActions.clearConnection('Wallet-Verbindung nicht freigegeben.');status(err.message||'Wallet-Verbindung nicht freigegeben.');$('lw-connect').querySelector('span').textContent='Wallet verbinden';}}
     finally{if(run===epoch)setBusy(false);}
   }
   async function refresh(){
@@ -214,11 +225,11 @@ $('lw-refresh').onclick=refresh;
   $('lw-watch-form').onsubmit=async event=>{
     event.preventDefault();if(busy)return;const c=chains.find(c=>c.id===$('lw-network').value);let address;
     try{address=validateWatch($('lw-address').value,c);}catch(err){status(err.message);return;}
-    const run=++epoch;clearInterval(timer);detachEvm();activePlugin=null;provider=null;reset();keys.set(c.id,address);setBusy(true);status('Öffentliche Positionen lesen …');
+    const run=++epoch;clearInterval(timer);detachEvm();walletActions.clearConnection('Öffentliche Adresse wird gelesen.');activePlugin=null;provider=null;reset();keys.set(c.id,address);setBusy(true);status('Öffentliche Positionen lesen …');
     try{await scan([...keys],run);}finally{if(run===epoch)setBusy(false);}
   };
   $('lw-tools').onclick=()=>{const legacy=document.getElementById('legacy-workspace');legacy.hidden=!legacy.hidden;document.body.classList.toggle('lw-tools-open',!legacy.hidden);if(!legacy.hidden)window.dispatchEvent(new Event('halveth:open-tools'));if(!legacy.hidden)legacy.scrollIntoView({behavior:'smooth'});};
-  function accountChanged(){epoch++;clearInterval(timer);detachEvm();provider=null;reset();setBusy(false);$('lw-connect').querySelector('span').textContent='Wallet neu verbinden';status('Wallet-Konto oder aktives Netzwerk geändert. Neu verbinden.');}
+  function accountChanged(){epoch++;clearInterval(timer);detachEvm();walletActions.clearConnection('Wallet-Konto oder Netzwerk geändert.');provider=null;reset();setBusy(false);$('lw-connect').querySelector('span').textContent='Wallet neu verbinden';status('Wallet-Konto oder aktives Netzwerk geändert. Neu verbinden.');}
   window.addEventListener('keplr_keystorechange',()=>{if(activePlugin?.kind==='cosmos')accountChanged();});window.addEventListener('owallet_keystorechange',()=>{if(activePlugin?.kind==='cosmos')accountChanged();});window.addEventListener('leap_keystorechange',()=>{if(activePlugin?.id==='leap')accountChanged();});
   const clock=()=>{$('lw-clock').textContent=new Date().toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Berlin'})+' / BERLIN';};clock();setInterval(clock,30000);
   Promise.all([jsonFetch('data/chains.json'),jsonFetch('data/valuation.json')]).then(([registry,quotes])=>{chains=registry.chains;valuation=quotes;for(const c of allCosmos())$('lw-network').append(new Option(c.name,c.id));setBusy(false);render();}).catch(()=>status('Lokale Netzwerkliste nicht geladen. Bitte Seite neu öffnen.'));

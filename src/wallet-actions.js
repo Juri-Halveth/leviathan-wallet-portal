@@ -2,13 +2,14 @@ import {createWalletPlugins} from './wallet-plugins.js';
 import {walletRpc,normalizeChain} from './evm-read.js';
 import {ZERO_ADDRESS,GTC_ADDRESS,address,amountToUnits,hexToBigInt,buildTransfer,sameAddress,preflightFailureMessage,requestIntent} from './evm-actions-core.js';
 
+export function mountWalletActions(){
 const $=id=>document.getElementById(id);
 let plugins,provider=null,account=null,epoch=0,preview=null,busy=false;
 const setStatus=(id,message,kind='')=>{const node=$(id);node.textContent=message;node.className='status '+kind;};
 function invalidate(){epoch++;preview=null;$('preview').hidden=true;$('send-button').hidden=true;$('send-button').disabled=true;$('zero-confirm').checked=false;$('zero-confirm-wrap').hidden=true;}
 function updateButtons(){const connected=!!provider&&!!account;$('preview-button').disabled=!connected||busy;$('wish-button').disabled=!connected||busy;$('copy-address').disabled=!connected;$('connect').disabled=busy||!plugins?.list().some(x=>x.kind==='evm'&&x.available);}
 function renderChoices(){const current=$('wallet-choice').value,options=plugins.list().filter(x=>x.kind==='evm');$('wallet-choice').replaceChildren();for(const item of options){const option=new Option(item.name+(item.available?'':' · nicht erkannt'),item.id);option.disabled=!item.available;$('wallet-choice').add(option);}if(options.some(x=>x.id===current&&x.available))$('wallet-choice').value=current;else $('wallet-choice').selectedIndex=options.findIndex(x=>x.available);if(!options.some(x=>x.available))setStatus('connection-status','Öffne diese Seite im Browser deiner Wallet oder in Chrome mit der Wallet-Erweiterung.');updateButtons();}
-function clearConnection(message){detach(provider);provider=null;account=null;invalidate();$('account').textContent='Noch keine Wallet verbunden.';$('receive-address').textContent='Nach dem Verbinden erscheint deine Adresse.';setStatus('connection-status',message);updateButtons();}
+function clearConnection(message){detach(provider);provider=null;account=null;invalidate();$('action-connect-choice').hidden=false;$('account').textContent='Noch keine Wallet verbunden.';$('receive-address').textContent='Nach dem Verbinden erscheint deine Adresse.';setStatus('connection-status',message);updateButtons();}
 async function boundWallet(){
   if(!provider||!account)throw Error('Bitte zuerst eine Wallet verbinden.');
   const [chain,accounts]=await Promise.all([walletRpc(provider,'eth_chainId'),walletRpc(provider,'eth_accounts')]);
@@ -33,6 +34,7 @@ async function connect(){
     const next=address(accounts[0]);
     if(normalizeChain(await walletRpc(newProvider,'eth_chainId'))!=='0x1')throw Error('Bitte in der Wallet Ethereum Mainnet wählen und erneut verbinden.');
     detach(provider);provider=newProvider;account=next;listen(provider);
+    $('action-connect-choice').hidden=true;
     $('account').textContent=item.name+' · Ethereum Mainnet · '+account;
     $('receive-address').textContent=account;
     setStatus('connection-status','Verbunden. Adresse und Netzwerk sind bereit.','success');
@@ -132,3 +134,14 @@ $('zero-confirm').addEventListener('change',refreshSendButton);
 $('send-form').addEventListener('submit',checkTransfer);
 $('send-button').addEventListener('click',send);
 $('wish-form').addEventListener('submit',wish);
+return {
+  adoptConnection(nextProvider,nextAccount,name='Wallet'){
+    detach(provider);provider=nextProvider;account=address(nextAccount);listen(provider);invalidate();$('action-connect-choice').hidden=true;
+    $('account').textContent=name+' · '+account;
+    $('receive-address').textContent=account;
+    setStatus('connection-status','Wallet-Verbindung aus dem Browser Vault übernommen.','success');
+    updateButtons();
+  },
+  clearConnection(message='Wallet getrennt.'){clearConnection(message);}
+};
+}
