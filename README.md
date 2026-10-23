@@ -1,6 +1,8 @@
 # LEVIATHAN Wallet Portal
 
-Öffentlicher Browser Vault von **Juri Halveth (Juri Janovski)**: Wallets auswählen, unterstützte Netzwerke lesen und Positionen mit Quellen und Abdeckungslücken anzeigen. ETH- und GTC-Aktionen sind direkt in der Vault-Oberfläche integriert. Die Oraichain-Konsole bleibt als Fachbaustein über passende Positionsdetails erreichbar.
+**Person: Juri. Projekt: HALVETH.** [Namenszuordnung](IDENTITY.md).
+
+Öffentlicher Browser Vault von **Juri Janovski (Projekt HALVETH)**: Wallets auswählen, unterstützte Netzwerke lesen und Positionen mit Quellen und Abdeckungslücken anzeigen. ETH- und GTC-Aktionen sind direkt in der Vault-Oberfläche integriert. Die Oraichain-Konsole bleibt als Fachbaustein über passende Positionsdetails erreichbar.
 
 **Website:** https://juri-halveth.github.io/leviathan-wallet-portal/
 **Code und Versionen:** https://github.com/Juri-Halveth/leviathan-wallet-portal

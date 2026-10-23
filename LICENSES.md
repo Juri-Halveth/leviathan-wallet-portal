@@ -1,6 +1,6 @@
 # Rechte- und Lizenzkarte — LEVIATHAN Wallet Portal
 
-Copyright © 2026 Juri Janovski, öffentlich als Juri Halveth / [@Juri-Halveth](https://github.com/Juri-Halveth), **soweit Schutzrechte bestehen und von ihm kontrolliert werden**.
+Copyright © 2026 Juri Janovski, Projekt HALVETH / [@Juri-Halveth](https://github.com/Juri-Halveth), **soweit Schutzrechte bestehen und von ihm kontrolliert werden**.
 
 | Material | Rechtezuordnung |
 | --- | --- |
