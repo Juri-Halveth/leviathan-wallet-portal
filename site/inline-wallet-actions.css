@@ -31,4 +31,13 @@
 #luminous-root .view-panel .preview strong{color:#ff8baa}
 #luminous-root .view-panel [hidden]{display:none!important}
 #luminous-root .lw-action-dialog button:focus-visible,#luminous-root .lw-action-dialog input:focus-visible,#luminous-root .lw-action-dialog select:focus-visible{outline:2px solid #8de4e7;outline-offset:2px}
-@media(max-width:620px){#luminous-root .lw-action-dialog{padding:28px 18px;max-height:92svh}#luminous-root .lw-action-connect-row{flex-wrap:wrap}#luminous-root .lw-action-connect-row select{flex-basis:100%}#luminous-root .view-tab{padding:10px 9px}}
+@media(max-width:620px){
+  #luminous-root .lw-action-dialog{padding:28px 18px;max-height:92svh;max-width:calc(100vw - 24px)}
+  #luminous-root .lw-action-dialog>.lw-kicker{padding-right:34px}
+  #luminous-root .lw-action-connect-row{flex-wrap:wrap}
+  #luminous-root .lw-action-connect-row select{flex-basis:100%}
+  #luminous-root .view-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;overflow:visible}
+  #luminous-root .view-tab{min-width:0;min-height:44px;padding:10px 3px}
+  #luminous-root .lw-action-dialog button,#luminous-root .lw-action-dialog input:not([type=checkbox]),#luminous-root .lw-action-dialog select{min-height:44px}
+  #luminous-root .lw-inline-link{display:inline-flex;align-items:center;min-height:44px;padding:8px 0}
+}
