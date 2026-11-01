@@ -1,5 +1,9 @@
 # LEVIATHAN Wallet Portal
 
+![HALVETH / NETZ – Leviathan: Wallet-Fenster mit getrennten Netzwerkbahnen](HALVETH_NETZ_HERO.svg)
+
+**HALVETH / NETZ · Software.** [Starship Lab öffnen](https://juri-halveth.github.io/universum/) und dort die Projektkarte „LEVIATHAN PORTAL“ auswählen.
+
 **Person: Juri. Projekt: HALVETH.** [Namenszuordnung](IDENTITY.md).
 
 Öffentlicher Browser Vault von **Juri Janovski (Projekt HALVETH)**: Wallets auswählen, unterstützte Netzwerke lesen und Positionen mit Quellen und Abdeckungslücken anzeigen. ETH- und GTC-Aktionen sind direkt in der Vault-Oberfläche integriert. Die Oraichain-Konsole bleibt als Fachbaustein über passende Positionsdetails erreichbar.
