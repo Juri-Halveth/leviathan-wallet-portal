@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="300" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
+  <title id="title">HALVETH / NETZ · LEVIATHAN</title>
+  <desc id="desc">Leviathan: Wallet-Fenster mit getrennten Netzwerkbahnen</desc>
+  <defs>
+    <linearGradient id="space" x2="1" y2="1">
+      <stop stop-color="#080e1b"/>
+      <stop offset="1" stop-color="#182638"/>
+    </linearGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M36 0H0V36" fill="none" stroke="#abc3dd" stroke-opacity=".075"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="300" rx="22" fill="url(#space)"/>
+  <rect width="1200" height="300" rx="22" fill="url(#grid)"/>
+  <path d="M0 0h8v300H0" fill="#9bb2ff"/>
+  <path d="M815 35v230" stroke="#9bb2ff" stroke-opacity=".3"/>
+  <text x="68" y="64" fill="#9bb2ff" font-size="23" font-weight="700" letter-spacing="4" font-family="Segoe UI,Arial,sans-serif">HALVETH / NETZ</text>
+  <text x="69" y="113" fill="#aec8d8" font-size="18" letter-spacing="3" font-family="Segoe UI,Arial,sans-serif">SOFTWARE</text>
+  <text x="66" y="190" fill="#f7fbff" font-size="51" font-weight="750" font-family="Segoe UI,Arial,sans-serif">LEVIATHAN</text>
+  <text x="69" y="232" fill="#bfd1e2" font-size="22" font-family="Segoe UI,Arial,sans-serif">Wallet-Ansicht · sichtbare Datenabdeckung</text>
+  <path d="M68 257h322" stroke="#9bb2ff" stroke-width="3" stroke-linecap="round"/>
+
+          <rect x="855" y="91" width="242" height="144" rx="20" fill="#1b2540" stroke="#9bb2ff" stroke-width="3"/>
+          <path d="M855 132h242" stroke="#9bb2ff" stroke-width="3" opacity=".65"/>
+          <rect x="1000" y="151" width="109" height="53" rx="14" fill="#2c3c62" stroke="#cbd5ff" stroke-width="2"/>
+          <circle cx="1027" cy="178" r="9" fill="#9bb2ff"/>
+          <path d="M889 170h76m-76 25h54" stroke="#9bb2ff" stroke-width="4" opacity=".75"/>
+          <circle cx="917" cy="63" r="10" fill="#9bb2ff"/><circle cx="1037" cy="63" r="10" fill="#9bb2ff"/>
+          <path d="M917 73v18m120-18v18" stroke="#9bb2ff" stroke-width="2" stroke-dasharray="4 5"/>
+
+</svg>
