@@ -28,6 +28,8 @@ Dies ist ein veröffentlichter Code- und UI-Prototyp, kein vollständiger Vermö
 
 ## Lokal starten
 
+Der [offene Forschungsprüfer und die Wallet-Gegenproben](tools/eigenpruefung/README.md) lassen sich mit Git Bash oder Bash offline ausführen. Die [Kontrollkarte](tools/eigenpruefung/BETRIEBSMODELL.md) zeigt je Funktion, wer Daten erhält, wer signiert und wo reale Netzwerkgebühren entstehen können.
+
 ```sh
 npm ci --ignore-scripts
 npm test

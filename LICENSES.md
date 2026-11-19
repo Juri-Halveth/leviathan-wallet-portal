@@ -4,6 +4,7 @@ Copyright © 2026 Juri Janovski, Projekt HALVETH / [@Juri-Halveth](https://githu
 
 | Material | Rechtezuordnung |
 | --- | --- |
+| Eigenständiger Prüfer, Prüfskripte, Dokumentation und synthetische Beispiele im Verzeichnis `tools/eigenpruefung/` | [MIT](tools/eigenpruefung/LICENSE), einschließlich kommerzieller Nutzung nach den Lizenzbedingungen. Die verwendeten Bibliotheken tragen ihre eigenen Lizenzen. |
 | Neue, schutzfähige Originalbeiträge der Erweiterungen vom 19. und 21. Oktober 2026, wie in [CONTRIBUTIONS.md](CONTRIBUTIONS.md) abgegrenzt; neue öffentliche Projektkarte, Wallet-Aktionsseite, Texte und Integrationsänderungen dieser Stände | [HALVETH PIRL 2.0](LICENSE-HALVETH-PIRL-2.0.md) im jeweils kontrollierten Rechteumfang |
 | Vorhandene Sites-Version 2 und übernommene frühere Komponenten | Ihre bisherige Rechtslage und frühere wirksame Erlaubnisse; dieser Export lizenziert sie nicht rückwirkend um |
 | npm-Abhängigkeiten und deren gebündelte Anteile | Eigene Paketlizenzen; siehe Lockfile, [Drittanbieterhinweise](THIRD_PARTY_NOTICES.md) und Legal-Comment-Dateien im Build |

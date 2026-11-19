@@ -1,4 +1,5 @@
 import { fromBech32 } from '@cosmjs/encoding';
+import { assertPreviewTime } from './time.js';
 export const CHAIN = 'Oraichain';
 export function address(value, prefix='orai') {
   const input=value.trim();
@@ -39,6 +40,5 @@ export function message(text) {
 export function endpoint(value) {const url=new URL(value);if(url.protocol!=='https:')throw new Error('Für Mainnet-Endpunkte wird HTTPS benötigt.');return url.href.replace(/\/$/,'');}
 export function assertFresh(prepared,snapshot,sender,now=Date.now(),monotonicNow=performance.now()) {
   if(!prepared || prepared.snapshot!==snapshot || prepared.sender!==sender) throw new Error('Eingaben oder Wallet wurden geändert. Erneut simulieren.');
-  if(!Number.isFinite(now)||!Number.isFinite(prepared.time)||!Number.isFinite(monotonicNow)||!Number.isFinite(prepared.monotonicTime)||prepared.monotonicTime<0||monotonicNow<prepared.monotonicTime||now<prepared.time)throw new Error('Zeitbasis hat sich geändert. Erneut simulieren.');
-  if(now-prepared.time>=60000||monotonicNow-prepared.monotonicTime>=60000) throw new Error('Simulation ist mindestens 60 Sekunden alt. Erneut simulieren.');
+  assertPreviewTime(prepared.time,prepared.monotonicTime,now,monotonicNow);
 }
