@@ -17,6 +17,13 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm test
+      - name: Verify signed research exchange and wallet handoff
+        shell: bash
+        run: |
+          python3 -m venv "$RUNNER_TEMP/leviathan-review"
+          export HALVETH_REVIEW_PYTHON="$RUNNER_TEMP/leviathan-review/bin/python"
+          "$HALVETH_REVIEW_PYTHON" -m pip install --only-binary=:all: --require-hashes -r tools/eigenpruefung/requirements.lock
+          bash tools/eigenpruefung/pruefen.sh
       - run: npm run build
       - uses: actions/configure-pages@v5
         if: github.event_name != 'pull_request'

@@ -1,5 +1,6 @@
 import {createWalletPlugins} from './wallet-plugins.js';
 import {walletRpc,normalizeChain} from './evm-read.js';
+import {assertPreviewTime} from './time.js';
 import {ZERO_ADDRESS,GTC_ADDRESS,address,amountToUnits,hexToBigInt,buildTransfer,sameAddress,preflightFailureMessage,requestIntent} from './evm-actions-core.js';
 
 export function mountWalletActions(){
@@ -25,6 +26,7 @@ function detach(p){
 let listeners=[];
 function listen(p){for(const [event,message]of [['accountsChanged','Konto geändert. Bitte erneut verbinden.'],['chainChanged','Netzwerk geändert. Bitte erneut verbinden.'],['disconnect','Wallet getrennt.']]){const listener=()=>clearConnection(message);p.on?.(event,listener);listeners.push([event,listener]);}}
 async function connect(){
+  if(busy)return;
   busy=true;updateButtons();invalidate();
   try{
     const item=plugins.get($('wallet-choice').value);if(item.kind!=='evm')throw Error('Bitte eine EVM-Wallet wählen.');
@@ -52,7 +54,7 @@ function showPreview(data){
 }
 function refreshSendButton(){if(!preview)return;$('send-button').disabled=busy||(preview.asset==='ETH'&&sameAddress(preview.recipient,ZERO_ADDRESS)&&!$('zero-confirm').checked);}
 async function checkTransfer(event){
-  event.preventDefault();invalidate();busy=true;updateButtons();setStatus('send-status','Wallet und Transaktion werden geprüft …');const run=epoch;let stage='WALLET';
+  event.preventDefault();if(busy)return;invalidate();busy=true;updateButtons();setStatus('send-status','Wallet und Transaktion werden geprüft …');const run=epoch;let stage='WALLET';
   try{
     const from=await boundWallet();stage='INPUT';const asset=$('asset').value,recipient=address($('recipient').value.trim()),amount=$('amount').value.trim();
     const tx=buildTransfer({asset,from,to:recipient,amount});
@@ -82,24 +84,49 @@ async function checkTransfer(event){
   }catch(error){setStatus('send-status',preflightFailureMessage(stage,error),'error');}
   finally{busy=false;updateButtons();refreshSendButton();}
 }
+function checkSelection(selected, wallet){
+  assertPreviewTime(selected.at,selected.atMonotonic);
+  if(selected!==preview || selected.epoch!==epoch || wallet!==provider
+      || !sameAddress(selected.from,account) || selected.asset!==$('asset').value
+      || selected.recipient!==$('recipient').value.trim() || selected.amount!==$('amount').value.trim()){
+    throw new Error('Wallet oder Eingaben geändert. Bitte erneut prüfen.');
+  }
+  if(selected.asset==='ETH' && sameAddress(selected.recipient,ZERO_ADDRESS) && !$('zero-confirm').checked){
+    throw new Error('Bitte den Transfer an die Nulladresse ausdrücklich bestätigen.');
+  }
+}
 async function send(){
-  if(!preview)return;const selected=preview;
-  if(Date.now()<selected.at||Date.now()-selected.at>60000||performance.now()<selected.atMonotonic||performance.now()-selected.atMonotonic>60000){invalidate();setStatus('send-status','Die Prüfung ist abgelaufen oder die Zeitbasis hat sich geändert. Bitte erneut prüfen.','error');return;}
-  if(selected.epoch!==epoch||selected.asset!==$('asset').value||selected.recipient!==$('recipient').value.trim()||selected.amount!==$('amount').value.trim()){invalidate();setStatus('send-status','Eingaben geändert. Bitte erneut prüfen.','error');return;}
-  if(selected.asset==='ETH'&&sameAddress(selected.recipient,ZERO_ADDRESS)&&!$('zero-confirm').checked)return;
+  if(busy || !preview)return;
+  const selected=preview, wallet=provider;
+  let handedToWallet=false;
   busy=true;updateButtons();refreshSendButton();setStatus('send-status','Wallet öffnet die letzte Bestätigung …');
   try{
+    checkSelection(selected,wallet);
     await boundWallet();
-    if(selected.epoch!==epoch)throw Error('Wallet oder Eingabe geändert.');
-    const hash=await provider.request({method:'eth_sendTransaction',params:[selected.tx]});
+    checkSelection(selected,wallet);
+    invalidate();
+    handedToWallet=true;
+    const hash=await wallet.request({method:'eth_sendTransaction',params:[selected.tx]});
     if(typeof hash!=='string'||!/^0x[0-9a-fA-F]{64}$/.test(hash))throw Error('Wallet hat keinen gültigen Transaktionshash zurückgegeben.');
-    invalidate();const a=document.createElement('a');a.href='https://etherscan.io/tx/'+encodeURIComponent(hash);a.target='_blank';a.rel='noopener noreferrer';a.textContent='Status im Explorer ansehen ↗';$('send-status').replaceChildren(document.createTextNode('Wallet meldet Transaktionshash: '+hash+' · '),a);$('send-status').className='status success';
-    try{const receipt=await walletRpc(provider,'eth_getTransactionReceipt',[hash]);if(receipt?.status==='0x1')setStatus('send-status','Transaktion in einem Block bestätigt: '+hash,'success');else if(receipt?.status==='0x0')setStatus('send-status','Transaktion im Block fehlgeschlagen: '+hash,'error');}catch{}
-  }catch(error){setStatus('send-status',error?.code===4001?'In der Wallet abgebrochen.':error.message||'Senden fehlgeschlagen.','error');}
+    const a=document.createElement('a');a.href='https://etherscan.io/tx/'+encodeURIComponent(hash);a.target='_blank';a.rel='noopener noreferrer';a.textContent='Status im Explorer ansehen ↗';$('send-status').replaceChildren(document.createTextNode('Wallet meldet Transaktionshash: '+hash+' · '),a);$('send-status').className='status success';
+    try{
+      const receipt=await walletRpc(wallet,'eth_getTransactionReceipt',[hash]);
+      if(receipt?.transactionHash?.toLowerCase()===hash.toLowerCase() && /^0x[0-9a-fA-F]{64}$/.test(receipt.blockHash)){
+        if(receipt.status==='0x1')setStatus('send-status','Wallet meldet Bestätigung im Block: '+hash,'success');
+        else if(receipt.status==='0x0')setStatus('send-status','Wallet meldet Fehlschlag im Block: '+hash,'error');
+      }
+    }catch{}
+  }catch(error){
+    invalidate();
+    const message=error?.code===4001 ? 'In der Wallet abgebrochen.'
+      : handedToWallet ? 'Ausgang der Wallet-Anfrage unklar. Prüfe deinen Wallet-Verlauf vor einem neuen Transfer.'
+      : error?.message || 'Wallet-Prüfung fehlgeschlagen.';
+    setStatus('send-status',message,'error');
+  }
   finally{busy=false;updateButtons();refreshSendButton();}
 }
 async function wish(event){
-  event.preventDefault();busy=true;updateButtons();setStatus('wish-status','Contract wird geprüft …');
+  event.preventDefault();if(busy)return;busy=true;updateButtons();setStatus('wish-status','Contract wird geprüft …');
   try{const recipient=await boundWallet(),contract=address($('contract').value.trim()),amount=$('wish-amount').value.trim();const code=await walletRpc(provider,'eth_getCode',[contract,'latest']);if(typeof code!=='string'||code==='0x')throw Error('An dieser Adresse wurde kein Contract-Code gefunden.');await boundWallet();const intent=requestIntent({recipient,contract,amount});intent.createdAt=new Date().toISOString();const blob=new Blob([JSON.stringify(intent,null,2)+'\n'],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='leviathan-eth-bitte.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setStatus('wish-status','Bitte als JSON gespeichert. Eine Auszahlung braucht eine separate Zusage und Transaktion.','success');}
   catch(error){setStatus('wish-status',error.message||'Bitte konnte nicht erstellt werden.','error');}
   finally{busy=false;updateButtons();}
