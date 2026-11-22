@@ -1,0 +1,19 @@
+{
+  "schema": "halveth.security-transparency.v1",
+  "project": "LEVIATHAN",
+  "station": "LUCINETA",
+  "publication": "PREVIEW_ONLY",
+  "observedAt": null,
+  "sourceCommit": null,
+  "evidence": {
+    "status": "NOT_ATTESTED",
+    "signature": "NOT_PRESENT",
+    "verification": "NOT_PERFORMED"
+  },
+  "controls": {
+    "hardwareSsh": "NOT_VERIFIED",
+    "walletThreshold": "NOT_VERIFIED",
+    "sensitiveActionGate": "NOT_VERIFIED",
+    "recovery": "NOT_VERIFIED"
+  }
+}
