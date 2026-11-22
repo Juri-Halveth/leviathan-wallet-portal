@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="color-scheme" content="dark">
+  <title>LEVIATHAN | Öffentliche Sicherheitslage</title>
+  <link rel="stylesheet" href="security.css">
+</head>
+<body>
+  <main>
+    <p class="eyebrow">HALVETH / LEVIATHAN</p>
+    <h1>Sicherheitslage der Node</h1>
+    <p class="lead">Transparent bedeutet: geprüfte Zustände zeigen und ungeprüfte ausdrücklich offenlassen.</p>
+    <section class="panel" aria-live="polite">
+      <p class="eyebrow">Öffentlicher Sicherheitsnachweis</p>
+      <h2 id="report-title">Lade lokale Statusdatei …</h2>
+      <p id="report-detail">Noch kein Nachweis angezeigt.</p>
+      <ul id="controls"></ul>
+    </section>
+    <section class="panel secondary">
+      <h2>Was diese Seite nicht ist</h2>
+      <p>Kein Live-SSH-Zugang, keine öffentlich erreichbare Node-Steuerung, keine Wallet-Freigabe und kein Nachweis einer Hardware-Schlüsselpflicht. Die Vorschau darf auch bei fehlender Statusdatei kein grünes Sicherheitsversprechen abgeben.</p>
+      <p>Die spätere Nachweiskette benötigt eine signierte, zeitlich begrenzte, unabhängig überprüfbare Attestierung. Nur öffentliche Aussagen und Beleg-Hashes dürfen veröffentlicht werden, niemals Seeds, SSH-Private-Keys, Recovery-Daten oder interne Adressen.</p>
+    </section>
+    <nav aria-label="Projektlinks">
+      <a href="./index.html">Wallet-Portal</a>
+      <a href="https://github.com/Juri-Halveth/leviathan-wallet-portal">Quellcode</a>
+      <a href="https://github.com/Juri-Halveth/leviathan-wallet-portal/blob/main/SECURITY.md">Sicherheitsmeldungen</a>
+    </nav>
+    <p class="foot">Vorschau · kein Hardware-Schlüssel aktiviert · keine Verbindung zu LUCINETA hergestellt</p>
+  </main>
+  <script type="module" src="./security-ui.mjs"></script>
+</body>
+</html>
