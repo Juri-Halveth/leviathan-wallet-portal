@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/generate-notices.mjs && node scripts/sync-netz-hero.mjs && esbuild src/app.js src/vault.js --bundle --format=esm --platform=browser --legal-comments=external --outdir=site",
-    "test": "node --test src/core.test.js src/discovery.test.js src/evm-actions.test.js"
+    "test": "node --test src/core.test.js src/discovery.test.js src/evm-actions.test.js scripts/generate-notices.test.mjs"
   },
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "0.38.1",

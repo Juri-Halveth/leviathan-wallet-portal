@@ -1,6 +1,9 @@
 import {readFileSync,writeFileSync,readdirSync,existsSync,mkdirSync} from 'node:fs';
 import {join} from 'node:path';
 
+// Keep the separately maintained verifier attribution across every site build.
+const pythonNotices=readFileSync('PYTHON_PACKAGE_NOTICES.md','utf8').trim();
+if(!pythonNotices)throw new Error('PYTHON_PACKAGE_NOTICES.md must not be empty');
 const lock=JSON.parse(readFileSync('package-lock.json','utf8'));
 const packages=Object.entries(lock.packages).filter(([path])=>path.startsWith('node_modules/'));
 const rows=packages.map(([path,info])=>{
@@ -14,9 +17,10 @@ const rows=packages.map(([path,info])=>{
   return {name,version:info.version,license,folder};
 }).sort((a,b)=>a.name.localeCompare(b.name));
 let out='# Third-party package notices\n\n';
-out+='Generated from package-lock.json and installed package manifests. These packages retain their own licenses and copyrights. Generated bundles additionally preserve external legal comments.\n\n';
+out+='Generated from package-lock.json, installed package manifests and PYTHON_PACKAGE_NOTICES.md. These packages retain their own licenses and copyrights. Generated bundles additionally preserve external legal comments.\n\n';
 out+='| Package | Version | License declared by package |\n| --- | --- | --- |\n';
 for(const row of rows)out+=`| ${row.name} | ${row.version} | ${row.license} |\n`;
+out+=`\n${pythonNotices}\n`;
 out+='\n## License texts supplied by installed packages\n\n';
 const emitted=new Set();
 for(const row of rows){
